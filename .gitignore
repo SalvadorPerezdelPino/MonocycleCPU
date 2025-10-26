@@ -45,7 +45,6 @@ c5_pin_model_dump.txt
 modelsim.ini
 
 # IPs
-pll/
 pll_sim/
 pll_sim.f
 pll.sip
