@@ -8,7 +8,7 @@ module program_memory (
 
 	initial
 	begin
-		$readmemb("C:/Users/Usuario/Documents/clase/inf/TFG/FPGA/DE10/CPU/Monocycle/program.mem", mem);
+		$readmemb("C:/Users/Usuario/Documents/clase/inf/TFG/FPGA/DE10/CPU/Monocycle/mem/program.mem", mem);
 	end
 
 	assign inst = mem[addr];
