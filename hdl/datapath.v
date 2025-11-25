@@ -8,12 +8,12 @@ module datapath #(
 	// Control del camino de datos
 	input wire s_io_wr, s_addr,
 	input wire [1:0] s_wd3, s_pc,
-	input wire we3, wez, wes,
+	input wire we3, we_flags,
 	// Control de la pila
 	input wire push, pop,
 	// ALU
 	input wire [2:0] op_alu, 
-	output wire z, s,
+	output wire zero, sign, carry, overflow,
 	output wire [5:0] opcode, 
 	output wire [9:0] dir,
 	// I/O
@@ -28,7 +28,7 @@ module datapath #(
 	wire [9:0] jmp_pc, inc_pc, next_pc, ret_dir;
 	wire [DATA_WIDTH-1:0] inm, alu_res, rd1, rd2, wd3, alu_inm, data_to_io, data_from_io;
 	wire [7:0] inm_to_io; // No aumenta por diseño
-	wire z_alu, s_alu;
+	wire z_alu, s_alu, c_alu, o_alu;
 	
 	assign jmp_pc = inst[9:0];
 	assign ra1 = inst[11:8];
@@ -112,30 +112,50 @@ module datapath #(
 
 	// ALU para operaciones
 	alu alu1 (
-		.a      (rd1), 
-		.b      (rd2), 
-		.op_alu (op_alu), 
-		.y      (alu_res), 
-		.zero   (z_alu),
-		.sign   (s_alu)
+		.a      		(rd1), 
+		.b      		(rd2), 
+		.op_alu 		(op_alu), 
+		.y      		(alu_res), 
+		.zero   		(z_alu),
+		.sign   		(s_alu),
+		.carry  		(c_alu),
+		.overflow	(o_alu)
 	);
 				 
-	// Flag de cero en las operaciones ALU
+	// Zero flag
 	ffd ffz (
 		.clk	 (clk), 
 		.reset (reset), 
 		.d		 (z_alu), 
-		.carga (wez), 
-		.q		 (z)
+		.carga (we_flags), 
+		.q		 (zero)
 	);
 	
-	// Flag de signo en las operaciones ALU
+	// Sign flag
 	ffd ffs (
 		.clk	 (clk), 
 		.reset (reset), 
 		.d		 (s_alu), 
-		.carga (wes), 
-		.q		 (s)
+		.carga (we_flags), 
+		.q		 (sign)
+	);
+	
+	// Carry flag
+	ffd ffc (
+		.clk	 (clk), 
+		.reset (reset), 
+		.d		 (c_alu), 
+		.carga (we_flags), 
+		.q		 (carry)
+	);
+	
+	// Overflow flag
+	ffd ffo (
+		.clk	 (clk), 
+		.reset (reset), 
+		.d		 (o_alu), 
+		.carga (we_flags), 
+		.q		 (overflow)
 	);
 	
 	// Driver de acceso al bus de datos y direcciones

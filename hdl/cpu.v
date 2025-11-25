@@ -14,26 +14,26 @@ module cpu #(
 );
 	 
 
-	wire z, s;
+	wire zero, sign, carry, overflow;
 	wire s_io_wr, s_addr;
 	wire [1:0] s_wd3, s_pc;
 	wire push, pop;
 	wire enable_pc;
-	wire we3, wez, wes;
+	wire we3, we_flags;
 	wire [2:0] op_alu;
-	//wire [5:0] opcode;
 
 	control_unit cu1 (
 		.opcode 		(opcode), 
-	   .z      		(z),
-		.s				(s),
+	   .zero      	(zero),
+		.sign			(sign),
+		.carry		(carry),
+		.overflow	(overflow),
 	   .s_pc  		(s_pc), 
 		.s_wd3 		(s_wd3),
 		.s_io_wr 	(s_io_wr),
 		.s_addr		(s_addr),
 	   .we3    		(we3), 
-	   .wez    		(wez), 
-		.wes			(wes),
+	   .we_flags	(we_flags),
 	   .op_alu 		(op_alu),
 		.read	  		(read),
 		.write  		(write),
@@ -44,8 +44,8 @@ module cpu #(
 	);
 			  
 	datapath #(
-		.ADDR_WIDTH(ADDR_WIDTH),
-		.DATA_WIDTH(DATA_WIDTH)
+		.ADDR_WIDTH (ADDR_WIDTH),
+		.DATA_WIDTH (DATA_WIDTH)
 		) dp1 (
 		.clk      	(clk),
 		.reset    	(reset),
@@ -59,11 +59,12 @@ module cpu #(
 		.push			(push),
 		.pop			(pop),
 		.we3      	(we3),
-		.wez     	(wez),
-		.wes			(wes),
+		.we_flags   (we_flags),
 		.op_alu   	(op_alu), 
-		.z      	 	(z), 
-		.s				(s),
+		.zero      	(zero), 
+		.sign			(sign),
+		.carry		(carry),
+		.overflow	(overflow),
 		.opcode 	 	(opcode), 
 		.dir    	 	(pc),
 		.bus_data 	(bus_data),
