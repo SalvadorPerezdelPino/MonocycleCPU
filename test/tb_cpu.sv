@@ -4,6 +4,7 @@ module tb_cpu;
 	reg clk;
 	reg reset;
 	wire [9:0] pc;
+	wire [5:0] opcode;
 	reg [9:0] old_pc;
 	
 	always begin
@@ -32,6 +33,7 @@ module tb_cpu;
 		.clk   		(clk),
 		.reset 		(reset), 
 		.pc    		(pc),
+		.opcode		(opcode),
 		.bus_addr	(bus_addr),
 		.bus_data	(bus_data),
 		.read			(read),
@@ -54,20 +56,17 @@ module tb_cpu;
 	reg [DATA_WIDTH-1:0] expected_solution;
 	integer mem_reads, mem_writes;
 	real cycles, instructions, cpi;
-	real avg_cycles, avg_reads, avg_writes, avg_instructions, avg_cpi;
 	
 	string dir;
 	string input_filename;
 	string expected_filename;
 	string csv_filename;
-	string wave_filename;
 	integer input_fd;
 	integer expected_fd;
 	integer csv_fd;
 	
 	string id;
 	integer j;
-	integer file;
 	initial begin
 		// Get test parameters
 		$value$plusargs("DIR=%s", dir);
@@ -75,7 +74,6 @@ module tb_cpu;
 		input_filename = {dir, "/input_", id, ".mem"};
 		expected_filename = {dir, "/expected_", id, ".mem"};
 		csv_filename = {dir, "/data_", id, ".csv"};
-		wave_filename = {dir, "/waves_", id, ".vcd"};
 
 		// Check file openings
 		input_fd = $fopen(input_filename, "r");
@@ -114,7 +112,6 @@ module tb_cpu;
 		while (!halted) begin
 			@(posedge clk);
 			cycles = cycles + 1;
-			avg_cycles = avg_cycles + 1;
 			if (read) begin
 				mem_reads = mem_reads + 1;
 			end
@@ -132,7 +129,7 @@ module tb_cpu;
 
 		if (expected_solution == hw_solution) begin
 			$fdisplay(csv_fd, "test_id;expected_solution;hw_solution;cycles;instructions;cpi;memory_reads;memory_writes");
-			$display("Knapsack is CORRECT");
+			$display("Problem is CORRECT");
 			$display("Total cycles: %d", cycles);
 			$display("Total memory reads: %d", mem_reads);
 			$display("Total memory writes: %d", mem_writes);
@@ -143,9 +140,9 @@ module tb_cpu;
 					expected_solution, hw_solution, cycles, instructions, $rtoi(cpi), $rtoi((cpi - $rtoi(cpi)) * 10000), mem_reads, mem_writes);
 		end
 		else begin
-			$display("Knapsack FAILED");
-			$display("Expected solution: %d", expected_solution);
-			$display("Hardware solution: %d\n", hw_solution);
+			$display("Problem FAILED");
+			$display("Expected solution: %0d", expected_solution);
+			$display("Hardware solution: %0d\n", hw_solution);
 			$display("Total cycles: %d", cycles);
 			$display("Total memory reads: %d", mem_reads);
 			$display("Total memory writes: %d", mem_writes);
