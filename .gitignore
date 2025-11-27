@@ -35,6 +35,7 @@ c5_pin_model_dump.txt
 *.bsf
 *.log
 *.sta.rpt
+*_tmp
 
 # Simulation
 *.vcd
@@ -50,6 +51,7 @@ pll_sim.f
 pll.sip
 pll.spd
 pll.ppf
+pll.xml
 
 # For automatization
 test_files/
